@@ -1,6 +1,7 @@
 FROM jenkins/inbound-agent:alpine as jnlp
 
-FROM jenkins/agent:latest-jdk17
+#try jdk17 from July'25
+FROM jenkins/agent:3309.v27b_9314fd1a_4‑7‑jdk17
 
 ARG version
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="$version"
@@ -15,19 +16,13 @@ COPY --from=jnlp /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-agent
 RUN chmod +x /usr/local/bin/jenkins-agent && \
     ln -s /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-slave
 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]    
-
 # FYI reduce RUN calls -> minimize image sizes, avoid creating layers with unnecessary cached files
-RUN set -eux; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends \
-        ca-certificates \
-        software-properties-common \
-        curl gcc g++ gnupg unixodbc-dev openssl git \
-        build-essential zlib1g-dev libncurses5-dev libgdbm-dev libssl-dev \
-        libreadline-dev libffi-dev wget libbz2-dev libsqlite3-dev; \
-    update-ca-certificates; \
-    rm -rf /var/lib/apt/lists/*    
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends curl gcc g++ gnupg unixodbc-dev openssl git && \
+    apt-get install -y software-properties-common ca-certificates && \
+    apt-get install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libssl-dev libreadline-dev libffi-dev wget libbz2-dev libsqlite3-dev && \
+    update-ca-certificates
 
 # For maven install issue -> "error: error creating symbolic link '/usr/share/man/man1/mvn.1.gz.dpkg-tmp': No such file or directory"
 RUN mkdir -p /usr/share/man/man1
