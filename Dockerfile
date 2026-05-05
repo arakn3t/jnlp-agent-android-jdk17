@@ -62,6 +62,18 @@ RUN pip3 install \
     mkdocs-awesome-pages-plugin \
     mkdocs-git-revision-date-localized-plugin
 
+# ESO-API
+# Feature: AAAM-5142 install eso-api for automated delivery uploads
+RUN wget https://etf.esolutions.de/api/get/pip/lib_etf-2.7.2.tar.gz --no-check-certificate \
+    https://etf.esolutions.de/api/get/pip/etf-1.6.0.tar.gz --no-check-certificate
+
+RUN pip3 install \
+    requests \
+    'cryptography>=3.1' \
+    lib_etf-2.7.2.tar.gz \
+    etf-1.6.0.tar.gz
+    
+
 # plantuml
 ENV PLANTUML_VERSION=1.2023.2
 RUN apt-get update && apt-get install -y \
